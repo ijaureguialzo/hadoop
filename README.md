@@ -1,2 +1,3 @@
-# bigdata
-Cluster Hadoop para ejemplos Big Data.
+# Hadoop
+
+Cluster para ejemplos Big Data.
