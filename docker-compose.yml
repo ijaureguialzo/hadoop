@@ -49,12 +49,15 @@ services:
       - ./hadoop.env
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
+      HDFS_CONF_dfs_datanode_address: "0.0.0.0:7001"
+      HDFS_CONF_dfs_datanode_ipc_address: "0.0.0.0:7101"
     depends_on:
       - namenode
     expose:
       - 9864
     ports:
-      - 9866:9866
+      - 7001:7001
+      - 7101:7101
     networks:
       main:
         ipv4_address: 172.27.20.2
@@ -69,10 +72,15 @@ services:
       - ./hadoop.env
     environment:
       SERVICE_PRECONDITION: "namenode:9870"
+      HDFS_CONF_dfs_datanode_address: "0.0.0.0:7002"
+      HDFS_CONF_dfs_datanode_ipc_address: "0.0.0.0:7102"
     depends_on:
       - namenode
     expose:
       - 9864
+    ports:
+      - 7002:7002
+      - 7102:7102
     networks:
       main:
         ipv4_address: 172.27.20.3
