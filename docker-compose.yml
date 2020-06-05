@@ -4,6 +4,7 @@ services:
 
   https-portal:
     image: steveltn/https-portal:1
+    container_name: https-portal
     environment:
       DOMAINS: >
         namenode -> http://namenode:9870,
@@ -23,6 +24,7 @@ services:
 
   namenode:
     image: bde2020/hadoop-namenode:${HADOOP_VERSION}
+    container_name: namenode
     hostname: namenode
     volumes:
       - namenode_data:/hadoop/dfs/name
@@ -41,6 +43,7 @@ services:
 
   datanode1:
     image: bde2020/hadoop-datanode:${HADOOP_VERSION}
+    container_name: datanode1
     hostname: datanode1
     volumes:
       - datanode1_data:/hadoop/dfs/data
@@ -64,6 +67,7 @@ services:
 
   datanode2:
     image: bde2020/hadoop-datanode:${HADOOP_VERSION}
+    container_name: datanode2
     hostname: datanode2
     volumes:
       - datanode2_data:/hadoop/dfs/data
