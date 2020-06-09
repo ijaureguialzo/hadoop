@@ -10,6 +10,9 @@ services:
         namenode -> http://namenode:9870,
         datanode1 -> http://datanode1:9864,
         datanode2 -> http://datanode2:9864,
+        resourcemanager -> http://resourcemanager:8088,
+        nodemanager -> http://nodemanager:8042,
+        historyserver -> http://historyserver:8188,
       STAGE: local
     volumes:
       - https-portal_certs:/var/lib/https-portal
@@ -18,6 +21,11 @@ services:
       - 443:443
     depends_on:
       - namenode
+      - datanode1
+      - datanode2
+      - resourcemanager
+      - nodemanager
+      - historyserver
     networks:
       main:
         ipv4_address: 172.27.10.1
@@ -41,6 +49,69 @@ services:
       main:
         ipv4_address: 172.27.20.1
 
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager:${HADOOP_VERSION}
+    container_name: resourcemanager
+    hostname: resourcemanager
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:9864 datanode2:9864"
+    env_file:
+      - ./hadoop.env
+    expose:
+      - 8088
+    ports:
+      - 8088:8088
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+    networks:
+      main:
+        ipv4_address: 172.27.20.2
+    restart: on-failure
+    healthcheck:
+      disable: true
+
+  nodemanager:
+    image: bde2020/hadoop-nodemanager:${HADOOP_VERSION}
+    container_name: nodemanager
+    hostname: nodemanager
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:9864 datanode2:9864 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+    expose:
+      - 8042
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - resourcemanager
+    networks:
+      main:
+        ipv4_address: 172.27.20.3
+
+  historyserver:
+    image: bde2020/hadoop-historyserver:${HADOOP_VERSION}
+    container_name: historyserver
+    hostname: historyserver
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:9864 datanode2:9864 resourcemanager:8088"
+    volumes:
+      - historyserver_data:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop.env
+    expose:
+      - 8188
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - resourcemanager
+    networks:
+      main:
+        ipv4_address: 172.27.20.4
+
   datanode1:
     image: bde2020/hadoop-datanode:${HADOOP_VERSION}
     container_name: datanode1
@@ -63,7 +134,7 @@ services:
       - 7101:7101
     networks:
       main:
-        ipv4_address: 172.27.20.2
+        ipv4_address: 172.27.100.1
 
   datanode2:
     image: bde2020/hadoop-datanode:${HADOOP_VERSION}
@@ -87,7 +158,7 @@ services:
       - 7102:7102
     networks:
       main:
-        ipv4_address: 172.27.20.3
+        ipv4_address: 172.27.100.2
 
 networks:
   main:
@@ -101,3 +172,4 @@ volumes:
   namenode_data:
   datanode1_data:
   datanode2_data:
+  historyserver_data:

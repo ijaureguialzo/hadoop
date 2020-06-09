@@ -1,3 +1,6 @@
 127.0.0.1   namenode
 127.0.0.1   datanode1
 127.0.0.1   datanode2
+127.0.0.1   resourcemanager
+127.0.0.1   nodemanager
+127.0.0.1   historyserver
