@@ -1,0 +1,58 @@
+version: '3.5'
+
+services:
+
+  resourcemanager:
+    image: bde2020/hadoop-resourcemanager:${HADOOP_VERSION}
+    container_name: resourcemanager
+    hostname: resourcemanager
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:7001 datanode2:7002"
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8088:8088
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+    restart: on-failure
+    healthcheck:
+      disable: true
+
+  nodemanager:
+    image: bde2020/hadoop-nodemanager:${HADOOP_VERSION}
+    container_name: nodemanager
+    hostname: nodemanager
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:7001 datanode2:7002 resourcemanager:8088"
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8042:8042
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - resourcemanager
+
+  historyserver:
+    image: bde2020/hadoop-historyserver:${HADOOP_VERSION}
+    container_name: historyserver
+    hostname: historyserver
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:7001 datanode2:7002 resourcemanager:8088"
+    volumes:
+      - historyserver_data:/hadoop/yarn/timeline
+    env_file:
+      - ./hadoop.env
+    ports:
+      - 8188:8188
+    depends_on:
+      - namenode
+      - datanode1
+      - datanode2
+      - resourcemanager
+
+volumes:
+  historyserver_data:
