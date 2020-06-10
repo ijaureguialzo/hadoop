@@ -32,7 +32,7 @@ update:
 	@docker-compose pull
 
 clean:
-	@docker-compose down -v
+	@docker-compose -f docker-compose.yml -f docker-compose.extra.yml down -v --remove-orphans
 
 _urls-head:
 	@echo ""
