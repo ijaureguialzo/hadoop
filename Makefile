@@ -2,7 +2,7 @@ help:
 	@echo "Opciones:"
 	@echo "  start | stop | restart | stop-all"
 	@echo "  hadoop"
-	@echo "  update | clean"
+	@echo "  stats | update | clean"
 
 _start-command:
 	@docker-compose up -d --remove-orphans
@@ -19,6 +19,9 @@ stop-all:
 
 hadoop:
 	@docker-compose exec namenode /bin/bash
+
+stats:
+	@docker stats
 
 update:
 	@docker-compose pull
