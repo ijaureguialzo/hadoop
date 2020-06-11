@@ -47,18 +47,18 @@ _urls-footer:
 	@echo "--------------------"
 
 _urls-base:
-	@echo "\033[92m[NameNode]\033[0m http://namenode:9870"
-	@echo "\033[92m[DataNode 1]\033[0m http://datanode1:7201"
-	@echo "\033[92m[DataNode 2]\033[0m http://datanode2:7202"
+	@echo "[NameNode] http://namenode:9870"
+	@echo "[DataNode 1] http://datanode1:7201"
+	@echo "[DataNode 2] http://datanode2:7202"
 
 _urls-extra:
-	@echo "\033[92m[ResourceManager]\033[0m http://resourcemanager:8088"
-	@echo "\033[92m[NodeManager]\033[0m http://nodemanager:8042"
-	@echo "\033[92m[HistoryServer]\033[0m http://historyserver:8188"
+	@echo "[ResourceManager] http://resourcemanager:8088"
+	@echo "[NodeManager] http://nodemanager:8042"
+	@echo "[HistoryServer] http://historyserver:8188"
 
 _urls-ultra:
-	@echo "\033[92m[Hue]\033[0m http://hue:8888 \033[93m(El primer usuario registrado se convierte en admin)\033[0m"
-	@echo "\033[92m[Spark (master)]\033[0m http://spark-master:8080"
-	@echo "\033[92m[Spark (worker)]\033[0m http://spark-worker:8081"
-	@echo "\033[92m[Zeppelin]\033[0m http://zeppelin:8090"
-	@echo "\033[92m[phpMyAdmin]\033[0m http://phpmyadmin:8091"
+	@echo "[Hue] http://hue:8888 (El primer usuario registrado se convierte en admin)"
+	@echo "[Spark (master)] http://spark-master:8080"
+	@echo "[Spark (worker)] http://spark-worker:8081"
+	@echo "[Zeppelin] http://zeppelin:8090"
+	@echo "[phpMyAdmin] http://phpmyadmin:8091"
