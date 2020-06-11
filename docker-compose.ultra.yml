@@ -1,0 +1,134 @@
+version: '3.5'
+
+services:
+
+  hive-server:
+    image: bde2020/hive:${HIVE_VERSION}
+    container_name: hive-server
+    hostname: hive-server
+    env_file:
+      - ./hadoop.env
+    environment:
+      HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
+      SERVICE_PRECONDITION: "hive-metastore:9083"
+    expose:
+      - 10000
+    depends_on:
+      - hive-metastore
+
+  hive-metastore:
+    image: bde2020/hive:${HIVE_VERSION}
+    container_name: hive-metastore
+    hostname: hive-metastore
+    env_file:
+      - ./hadoop.env
+    command: /opt/hive/bin/hive --service metastore
+    environment:
+      SERVICE_PRECONDITION: "namenode:9870 datanode1:7001 datanode2:7002 hive-metastore-postgresql:5432"
+    expose:
+      - 9083
+    depends_on:
+      - hive-metastore-postgresql
+
+  hive-metastore-postgresql:
+    container_name: hive-metastore-postgresql
+    hostname: hive-metastore-postgresql
+    image: bde2020/hive-metastore-postgresql:${HIVE_METASTORE_VERSION}
+    depends_on:
+      - namenode
+
+  spark-master:
+    image: bde2020/spark-master:${SPARK_VERSION}
+    container_name: spark-master
+    hostname: spark-master
+    ports:
+      - 8080:8080
+    expose:
+      - 7077
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+    env_file:
+      - ./hadoop.env
+
+  spark-worker:
+    image: bde2020/spark-worker:${SPARK_VERSION}
+    container_name: spark-worker
+    hostname: spark-worker
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+      - HIVE_CORE_CONF_javax_jdo_option_ConnectionURL=jdbc:postgresql://hive-metastore/metastore
+    ports:
+      - 8081:8081
+    env_file:
+      - ./hadoop.env
+
+  zeppelin:
+    image: openkbs/docker-spark-bde2020-zeppelin:${ZEPPELIN_VERSION}
+    environment:
+      CORE_CONF_fs_defaultFS: "hdfs://namenode:8020"
+      SPARK_MASTER: "spark://spark-master:7077"
+      MASTER: "spark://spark-master:7077"
+      SPARK_MASTER_URL: spark://spark-master:7077
+      ZEPPELIN_PORT: 8090
+      ZEPPELIN_JAVA_OPTS:
+        -Dspark.driver.memory=1g
+        -Dspark.executor.memory=2g
+    ports:
+      - 8090:8090
+    env_file:
+      - ./hadoop.env
+    volumes:
+      - zeppelin_data:/usr/lib/zeppelin/data:rw
+      - zeppelin_notebook:/usr/lib/zeppelin/notebook:rw
+    command: /usr/lib/zeppelin/bin/zeppelin.sh
+
+  hue:
+    image: gethue/hue:${HUE_VERSION}
+    hostname: hue
+    dns: 8.8.8.8
+    ports:
+      - 8888:8888
+    volumes:
+      - ./hue.ini:/usr/share/hue/desktop/conf/z-hue.ini
+    depends_on:
+      - database
+
+  database:
+    image: mysql:${MYSQL_VERSION}
+    expose:
+      - 3306
+    command: --init-file /data/application/init.sql
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/data/application/init.sql
+    environment:
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: hue
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - 8091:80
+    depends_on:
+      - database
+    environment:
+      - PMA_HOST=database
+      - PMA_PORT=3306
+      - PMA_ABSOLUTE_URI=https://phpmyadmin
+      - PMA_USER=root
+      - PMA_PASSWORD=secret
+    volumes:
+      - phpmyadmin_sessions:/sessions
+
+volumes:
+  mysql_data:
+  phpmyadmin_sessions:
+  namenode_data:
+  zeppelin_data:
+  zeppelin_notebook:

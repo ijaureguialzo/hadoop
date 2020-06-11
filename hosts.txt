@@ -1,6 +1,13 @@
 127.0.0.1   namenode
 127.0.0.1   datanode1
 127.0.0.1   datanode2
+
 127.0.0.1   resourcemanager
 127.0.0.1   nodemanager
 127.0.0.1   historyserver
+
+127.0.0.1   hue
+127.0.0.1   spark-master
+127.0.0.1   spark-worker
+127.0.0.1   zeppelin
+127.0.0.1   phpmyadmin
