@@ -16,7 +16,6 @@ services:
       - namenode
       - datanode1
       - datanode2
-    restart: on-failure
     healthcheck:
       disable: true
 
